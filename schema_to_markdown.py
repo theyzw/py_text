@@ -1,11 +1,18 @@
 import re
 
-# 删除'
-
 
 def delete_symbol(str):
+    """删除符号
+    """
     str = str.strip().strip('\'').strip('`')
     return str
+
+
+def first_symbol_after_index(text, index, symbol):
+    """index位置之后第一个symbol
+    """
+    last_index = text.find(symbol, index)
+    return last_index
 
 
 result = ''
@@ -25,11 +32,15 @@ for m in re.finditer(sub_create_table, text):
     if not m:
         break
     # 从start开始找往后第一个;
-    last_index = text.find(';', m.start())
+    last_index = first_symbol_after_index(text, m.start(), ';')
     ddl.append(text[m.start():last_index])
 
 sub_table_comment = 'comment='
 for sql in ddl:
+    # 主键
+    primary_key = ''
+    # 索引
+    key = []
     header = '### '
     # 查找表注释
     table_comment_index = sql.find(sub_table_comment)
@@ -39,7 +50,7 @@ for sql in ddl:
         header += table_comment
     # 查找表名
     # create table之后第一个(
-    first_bracket_index = sql.find('(')
+    first_bracket_index = first_symbol_after_index(sql, 0, '(')
     table_name = sql[len(sub_create_table): first_bracket_index]
     table_name = delete_symbol(table_name)
     header += '(' + table_name + ')'
@@ -54,10 +65,23 @@ for sql in ddl:
 
     print(row_sql)
 
-    lines = row_sql.split('\n')
+    # 主键位置
+    for pk in re.finditer(row_sql, 'primary key'):
+        print(222)
+        # pk位置之后第一个,
+        index = first_symbol_after_index(row_sql, pk.start(), ',')
+        pk_str = row_sql[pk.start(): index]
+        print(11111)
+        print(pk_str)
 
-    for line in lines:
-        print(line)
+    # 索引
+
+    # print(row_sql)
+
+    # lines = row_sql.split(',\n')
+
+    # for line in lines:
+    # print(line)
 
     # 索引
 
