@@ -1,3 +1,3 @@
 # py_text
 
-sql_to_markdown
+db_schema_to_markdown
